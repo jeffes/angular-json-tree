@@ -114,22 +114,39 @@ angular.module('angular-json-tree', ['ajs.RecursiveDirectiveHelper'])
                     elem.addClass('expandable');
                     // Setup preview text
                     var isArray = utils.is(scope.value, 'Array');
-                    scope.preview = isArray ? '[ ' : '{ ';
+                    var count = scope.value.length;
+
+                    scope.preview = '';
+                    if (count > 0) {
+                        scope.preview = isArray ? '[ ' : '{ ';
+                    }
+
                     utils.forKeys(scope.value, function jsonNodeDirectiveLinkForKeys(key, value) {
                         if (isArray) {
-                            scope.preview += value + ', ';
+                            scope.preview += 'count=' + count + ' ' + value + ', ';
                         } else {
                             scope.preview += key + ': ' + value + ', ';
                         }
                     });
-                    scope.preview = scope.preview.substring(0, scope.preview.length - (scope.preview.length > 2 ? 2 : 0)) + (isArray ? ' ]' : ' }');
+
+                    scope.preview = scope.preview.substring(0, scope.preview.length - (scope.preview.length > 2 ? 2 : 0));
+                    if (count > 0) {
+                        scope.preview += (isArray ? ' ]' : ' }');
+                    }
+
                     // If directive initially has isExpanded set, also set shouldRender to true
                     if (scope.startExpanded && scope.startExpanded()) {
                         scope.shouldRender = true;
                         elem.addClass('expanded');
                     }
+
                     // Setup isExpanded state handling
                     scope.isExpanded = scope.startExpanded ? scope.startExpanded() : false;
+
+                    // if scope.value.includes('high_priority') {
+                    //     scope.isExpanded = true;
+                    // }
+
                     scope.toggleExpanded = function jsonNodeDirectiveToggleExpanded() {
                         scope.isExpanded = !scope.isExpanded;
                         if (scope.isExpanded) {
@@ -140,6 +157,7 @@ angular.module('angular-json-tree', ['ajs.RecursiveDirectiveHelper'])
                         // For delaying subnode render until requested
                         scope.shouldRender = true;
                     };
+                    scope.toggleExpanded();
                 } else {
                     scope.isExpandable = false;
                     // Add expandable class for CSS usage
